@@ -41,6 +41,16 @@
 \RequirePackage{cite}
 \RequirePackage{setspace}
 \RequirePackage{enumitem}
+\ifPDFTeX
+  \RequirePackage[hidelinks]{hyperref}
+\else
+  \ifLuaTeX
+    \RequirePackage[hidelinks]{hyperref}
+  \else
+    \RequirePackage[dvipdfmx,hidelinks]{hyperref}
+    \RequirePackage{pxjahyper} % 和文しおりを正しく扱う
+  \fi
+\fi
 \renewcommand{\bibname}{参考文献}
 
 % エンジン判定：pTeX系なら \zw が既に定義済み。なければ簡易定義。
