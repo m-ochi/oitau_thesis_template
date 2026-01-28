@@ -8,10 +8,17 @@
 % --- 1. 大学指定の余白設定 (左30, 右20, 上25, 下30) ---
 % ドライバはエンジン別に指定
 \RequirePackage{iftex}
-\ifpdftex
+\ifPDFTeX
+  % pdfLaTeX
   \RequirePackage[left=30mm, right=20mm, top=25mm, bottom=30mm]{geometry}
 \else
-  \RequirePackage[dvipdfmx, left=30mm, right=20mm, top=25mm, bottom=30mm]{geometry}
+  \ifLuaTeX
+    % LuaLaTeX（ドライバ指定なしでPDF出力）
+    \RequirePackage[left=30mm, right=20mm, top=25mm, bottom=30mm]{geometry}
+  \else
+    % pLaTeX/uplatex（dvipdfmx経由）
+    \RequirePackage[dvipdfmx, left=30mm, right=20mm, top=25mm, bottom=30mm]{geometry}
+  \fi
 \fi
 
 % --- 2. パッケージ  ---
@@ -20,11 +27,15 @@
 \@namedef{ver@zxjafont.sty}{avoided}
 \makeatother
 
-\ifpdftex
+\ifPDFTeX
   \RequirePackage{graphicx}
 \else
-  % pTeX/uplatex系: dvipdfmx を明示して BoundingBox エラーを回避
-  \RequirePackage[dvipdfmx]{graphicx}
+  \ifLuaTeX
+    \RequirePackage{graphicx}
+  \else
+    % pTeX/uplatex系: dvipdfmx を明示して BoundingBox エラーを回避
+    \RequirePackage[dvipdfmx]{graphicx}
+  \fi
 \fi
 \RequirePackage{amsmath, amssymb}
 \RequirePackage{cite}
@@ -135,11 +146,11 @@
     \@tempdima=\linewidth
     \advance\@tempdima by -#1\zw
     \divide\@tempdima by #1
-    \ifpTeX
-      % 和文文字間を均等に伸縮させて #1 文字/行に近づける
-      \advance\@tempdima by 0.25pt % 文字間を少し広げて改行を早める
-      \kanjiskip=\@tempdima
-      \xkanjiskip=0pt
+    \ifdefined\kanjiskip
+      % 和文間隔に微小な伸縮性を持たせ右端を揃えやすくする
+      \advance\@tempdima by 0.25pt
+      \kanjiskip=\@tempdima plus 0.25pt minus 0.15pt
+      \xkanjiskip=0pt plus 0.1pt minus 0.05pt
     \fi
     \setlength{\parindent}{1\zw}
 }
